@@ -29,7 +29,7 @@ app.use("/user", (userRouter));
 
 app.use("/dashboard", (dashboardRouter));
 
-app.get("/chat-api-agung-gglavm4o2-agungsukaafk.vercel.app", (req, res) => {
+app.get("/", (req, res) => {
     res.json({
         message: "Api working"
     })
