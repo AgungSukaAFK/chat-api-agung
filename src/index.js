@@ -27,7 +27,13 @@ app.listen(4000, () => {
 
 app.use("/user", (userRouter));
 
-app.use("/dashboard", (dashboardRouter));
+app.use("/chat-api-agung.vercel.app/dashboard", (dashboardRouter));
+
+app.get("/chat-api-agung.vercel.app/", (req, res) => {
+    res.json({
+        message: "Api working"
+    })
+})
 
 app.use("/chat", (chatRouter));
 
