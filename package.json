@@ -1,0 +1,25 @@
+{
+  "name": "chat-api",
+  "version": "1.0.0",
+  "description": "Api untuk web chat global",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon ./src/index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "expressjs",
+    "restful",
+    "api"
+  ],
+  "author": "AgungSukaAFK",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^7.5.0",
+    "nodemon": "^3.0.1"
+  }
+}
