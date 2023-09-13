@@ -87,7 +87,7 @@ res succesfull
 
 # Get chat
 
-GET /api/chats  
+POST /api/chats  
 
 req body  
 ```json
