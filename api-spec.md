@@ -89,13 +89,6 @@ res succesfull
 
 GET /api/chats  
 
-req body  
-```json
-"data": {
-    "room": "global"
-}
-```
-
 res success  
 ```json
 "data" : {

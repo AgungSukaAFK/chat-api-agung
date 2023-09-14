@@ -1,3 +1,5 @@
+import chat from "../model/chats-model.js";
+
 const getChat =  async (req, res)=> {
     let objChats = await chat.find({"server": "global"});
     let globalChats;
