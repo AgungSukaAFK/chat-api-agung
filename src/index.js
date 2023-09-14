@@ -6,9 +6,10 @@ import dashboardRouter from "./router/dashboard-router.js";
 import chatRouter from "./router/chat-router.js";
 import session from "express-session";
 import mongodb from "./database/mongodb.js";
+import cors from "cors"
 
 const app = express();
-
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
