@@ -30,13 +30,29 @@ app.use("/user", (userRouter));
 
 app.use("/dashboard", (dashboardRouter));
 
+
+app.get("/login", (req, res) => {
+    let from = req.query.from;
+    let message;
+    if(from == "chat"){
+        message = "Silahkan login dulu untuk masuk ke halaman chat"
+    } else if(from == "dashboard"){
+        message = "Silahkan login dulu untuk mengakses dashboard"
+    } else {
+        message = "Welcome to login"
+    }
+    res.json({
+        message
+    })
+})
+
+app.use("/chat", (chatRouter));
+
 app.get("/", (req, res) => {
     res.json({
         message: "Api working"
     })
 })
-
-app.use("/chat", (chatRouter));
 
 app.use("/*", (req, res, next) => {
     res.status(404)

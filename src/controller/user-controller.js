@@ -38,7 +38,8 @@ const getUser = async (req, res) => {
 const loginUser = (req, res) => {
     let {userId, password} = req.body; //
     if(userId && password){
-        user.findOne({userId})
+        user
+        .findOne({userId})
         .then((result) => {
             if(result){
                 if(result.password == password){
