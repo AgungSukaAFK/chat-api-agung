@@ -30,8 +30,12 @@ app.use(express.urlencoded({
 app.use(session({
     secret: "Kucing oren",
     store: store,
-    saveUninitialized: true,
-    resave: false
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        secure: true,
+        maxAge: 1000 * 60 * 10
+    }
 }))
 
 app.listen(4000, () => {
