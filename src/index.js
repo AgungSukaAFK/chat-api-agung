@@ -7,6 +7,18 @@ import chatRouter from "./router/chat-router.js";
 import session from "express-session";
 import mongodb from "./database/mongodb.js";
 import cors from "cors"
+import MongoDBStore from "connect-mongodb-session";
+
+let mongoDBStoreSession = MongoDBStore(session);
+
+let store = new mongoDBStoreSession({
+    uri: process.env.MONGO_URI,
+    collection: 'mySessions'
+  });
+
+  store.on('error', function(error) {
+    console.log(error);
+  });
 
 const app = express();
 app.use(cors())
@@ -18,6 +30,7 @@ app.use(express.urlencoded({
 app.use(session({
     secret: "Kucing oren",
     cookie: {maxAge: 1000*60*60},
+    store: store,
     saveUninitialized: true,
     resave: false
 }))
