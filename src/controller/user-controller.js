@@ -44,6 +44,7 @@ const loginUser = (req, res) => {
             if(result){
                 if(result.password == password){
                     req.session.user = result;
+                    req.session.isAuth = true
                     res.json({
                         message: "Login succesfully",
                         sectionId: req.session.id

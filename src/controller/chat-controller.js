@@ -1,26 +1,22 @@
 import chat from "../model/chats-model.js";
 
 const getChat =  async (req, res)=> {
-    if(req.session.user){
-        let objChats = await chat.find({"server": "global"});
-        let globalChats;
-        objChats.forEach((item) => {
-            if(item.server == "global"){
-                globalChats = item.chats;
-            }
-        })
-    
-        if(globalChats){
-            res.json({
-                globalChats
-            })
-        } else {
-            res.status(500).json({
-                message: "Database error cant find chat server"
-            })
+    let objChats = await chat.find({"server": "global"});
+    let globalChats;
+    objChats.forEach((item) => {
+        if(item.server == "global"){
+            globalChats = item.chats;
         }
+    })
+
+    if(globalChats){
+        res.json({
+            globalChats
+        })
     } else {
-        res.redirect("/login?from=chat");
+        res.status(500).json({
+            message: "Database error cant find chat server"
+        })
     }
 
 }

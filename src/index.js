@@ -30,7 +30,7 @@ app.use(express.urlencoded({
 app.use(session({
     secret: "Kucing oren",
     store: store,
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false
 }))
 
@@ -41,7 +41,6 @@ app.listen(4000, () => {
 app.use("/user", (userRouter));
 
 app.use("/dashboard", (dashboardRouter));
-
 
 app.get("/login", (req, res) => {
     let from = req.query.from;
@@ -58,7 +57,16 @@ app.get("/login", (req, res) => {
     })
 })
 
-app.use("/chat", (chatRouter));
+
+const userr = (req, res, next) => {
+    if(req.session.user){
+        next()
+    } else {
+        res.redirect("/login")
+    }
+}
+
+app.use("/chat", userr, (chatRouter));
 
 app.get("/", (req, res) => {
     res.json({
