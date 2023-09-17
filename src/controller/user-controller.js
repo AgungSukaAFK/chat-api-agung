@@ -44,11 +44,11 @@ const loginUser = (req, res) => {
             if(result){
                 if(result.password == password){
                     req.session.user = result;
-                    // res.json({
-                    //     message: "Login succesfully",
-                    //     sectionId: req.session.id
-                    // })
-                    res.redirect("/dashboard")
+                    res.json({
+                        message: "Login succesfully",
+                        sectionId: req.session.id
+                    })
+                    // res.redirect("/dashboard")
                 } else if(result.password != password){
                     res.json({
                         message: "Password salah"

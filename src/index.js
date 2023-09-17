@@ -29,9 +29,8 @@ app.use(express.urlencoded({
 
 app.use(session({
     secret: "Kucing oren",
-    cookie: {maxAge: 1000*60*60},
     store: store,
-    saveUninitialized: true,
+    saveUninitialized: false,
     resave: false
 }))
 
