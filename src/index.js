@@ -31,7 +31,7 @@ app.use(express.urlencoded({
     extended: true
 }))
 
-app.use(cookieParser("secret"))
+// app.use(cookieParser("secret"))
 
 // app.set("trust proxy", 1)
 
@@ -43,7 +43,7 @@ app.use(session({
     cookie: {
         // secure: true,
         maxAge: 1000 * 60 * 10,
-        sameSite: "strict"
+        // sameSite: "strict"
     }
 }))
 
