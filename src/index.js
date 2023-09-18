@@ -15,11 +15,11 @@ let mongoDBStoreSession = MongoDBStore(session);
 let store = new mongoDBStoreSession({
     uri: process.env.MONGO_URI,
     collection: 'mySessions'
-  });
+});
 
-  store.on('error', function(error) {
-    console.log(error);
-  });
+store.on('error', function(error) {
+console.log(error);
+});
 
 const app = express();
 app.use(cors({
@@ -38,7 +38,7 @@ app.use(express.urlencoded({
 app.use(session({
     secret: "secret",
     store: store,
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false,
     cookie: {
         secure: true,
@@ -49,8 +49,8 @@ app.use(session({
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    // res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
+    // res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     next();
   })
 
