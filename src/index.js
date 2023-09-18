@@ -7,6 +7,7 @@ import chatRouter from "./router/chat-router.js";
 import session from "express-session";
 import mongodb from "./database/mongodb.js";
 import cors from "cors"
+import cookieParser from "cookie-parser";
 import MongoDBStore from "connect-mongodb-session";
 
 let mongoDBStoreSession = MongoDBStore(session);
@@ -21,20 +22,28 @@ let store = new mongoDBStoreSession({
   });
 
 const app = express();
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}))
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }))
 
+app.use(cookieParser("secret"))
+
+// app.set("trust proxy", 1)
+
 app.use(session({
-    secret: "Kucing oren",
+    secret: "secret",
     store: store,
     saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: true,
-        maxAge: 1000 * 60 * 10
+        // secure: true,
+        maxAge: 1000 * 60 * 10,
+        sameSite: "strict"
     }
 }))
 
@@ -64,9 +73,15 @@ app.get("/login", (req, res) => {
 
 const userr = (req, res, next) => {
     if(req.session.user){
+        console.log(`Dari middleware: ${req.session}`)
         next()
     } else {
-        res.redirect("/login")
+        // res.redirect("/login")
+        // console.log("Sesi chat: " + req.session);
+        res.json({
+            session: req.session,
+            message: "fail"
+        })
     }
 }
 

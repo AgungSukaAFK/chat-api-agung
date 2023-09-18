@@ -44,9 +44,12 @@ const loginUser = (req, res) => {
             if(result){
                 if(result.password == password){
                     req.session.user = result;
+                    // console.log(req)
+                    // console.log(req.session)
                     res.json({
                         message: "Login succesfully",
-                        sectionId: req.session.id
+                        session: req.session
+                        // sectionId: req.session.id
                     })
                     // res.redirect("/dashboard")
                 } else if(result.password != password){
@@ -62,7 +65,8 @@ const loginUser = (req, res) => {
         })
         .catch((err) => {
             res.json({
-                message: "Database error"
+                message: "Database error",
+                err
             })
         })
     }
