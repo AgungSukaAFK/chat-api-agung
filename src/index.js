@@ -22,6 +22,10 @@ store.on('error', function(error) {
 
 const app = express();
 
+app.listen(4000, () => {
+    console.log(`Service listening on PORT 4000 ...`)
+})
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
@@ -46,7 +50,7 @@ app.use(session({
     name: "ao-chat",
     secret: "secret",
     store: store,
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false,
     cookie: {
         secure: 'auto',
@@ -56,9 +60,6 @@ app.use(session({
 }))
 
 
-app.listen(4000, () => {
-    console.log(`Service listening on PORT 4000 ...`)
-})
 
 app.use("/user", (userRouter));
 
