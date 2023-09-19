@@ -37,6 +37,7 @@ app.use(express.urlencoded({
 app.set("trust proxy", 1)
 
 app.use(session({
+    name: "ao-chat",
     secret: "secret",
     store: store,
     saveUninitialized: false,
