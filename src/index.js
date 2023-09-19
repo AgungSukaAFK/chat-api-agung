@@ -7,7 +7,6 @@ import chatRouter from "./router/chat-router.js";
 import session from "express-session";
 import mongodb from "./database/mongodb.js";
 import cors from "cors"
-import cookieParser from "cookie-parser";
 import MongoDBStore from "connect-mongodb-session";
 
 let mongoDBStoreSession = MongoDBStore(session);
@@ -22,10 +21,11 @@ console.log(error);
 });
 
 const app = express();
+
 app.use(cors({
     origin: "http://localhost:5173",
+    credentials: true,
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-    credentials: true
 }))
 app.use(express.json());
 app.use(express.urlencoded({
@@ -39,21 +39,19 @@ app.use(express.urlencoded({
 app.use(session({
     secret: "secret",
     store: store,
-    saveUninitialized: true,
+    saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: true,
+        secure: 'auto',
         maxAge: 1000 * 60 * 10,
-        sameSite: "none"
+        // sameSite: "none"
     }
 }))
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-    // res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-    // res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     next();
-  })
+})
 
 app.listen(4000, () => {
     console.log(`Service listening on PORT 4000 ...`)
