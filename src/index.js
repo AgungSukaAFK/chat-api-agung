@@ -17,7 +17,7 @@ let store = new mongoDBStoreSession({
 });
 
 store.on('error', function(error) {
-console.log(error);
+    console.log(error);
 });
 
 const app = express();
@@ -27,6 +27,12 @@ app.use(cors({
     credentials: true,
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
 }))
+
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+    next();
+})
+
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -49,10 +55,6 @@ app.use(session({
     }
 }))
 
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-    next();
-})
 
 app.listen(4000, () => {
     console.log(`Service listening on PORT 4000 ...`)
