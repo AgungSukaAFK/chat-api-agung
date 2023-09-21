@@ -87,9 +87,7 @@ const createUser = async (req, res, next) => {
     
     if(!req.body){
         res.json({
-            data: {
-                message: "Req body required"
-            }
+            message: "Req body required"
         })
         next()
     }
@@ -98,9 +96,7 @@ const createUser = async (req, res, next) => {
 
     if(!userId || !username || !password){
         res.json({
-            data: {
-                message: "Req body required, format read the api spec"
-            }
+            message: "Req body required, format read the api spec"
         })
     } else {
         let newUser = new user({
@@ -127,9 +123,7 @@ const createUser = async (req, res, next) => {
             } else if(!sudah_ada){
                 await newUser.save();
                 res.json({
-                    data: {
-                        message: "User created"
-                    }
+                    message: "User created"
                 })
             }
         } catch (error) {
