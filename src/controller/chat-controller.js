@@ -4,7 +4,7 @@ const getChat =  async (req, res)=> {
     let objChats = await chat.find({"server": "global"});
     let globalChats;
     objChats.forEach((item) => {
-        if(item.server == "global"){
+        if(item.chatAddress == "global"){ // ubah ini jadi globalnya dimbil dari tab chat yang sedang aktif
             globalChats = item.chats;
         }
     })
@@ -34,6 +34,7 @@ const sendChat = async (req, res)=> {
     // res.json({
     //     "Message": "yeay"
     // })
+
     let newChat = {
         chat: reqChat,
         from: reqFrom
@@ -41,7 +42,7 @@ const sendChat = async (req, res)=> {
 
     try {
         await chat.updateOne(
-            {server: "global"},
+            {chatAddress: "global"},
             {$push: {chats: newChat}}
         )
         chat.find().then((result) => {

@@ -15,20 +15,29 @@ let userSchema = new Schema({
         type: String,
         required: true
     },
-    online: {
-        type: Boolean,
-        default: false
-    },
     photoIndex: {
         type: Number,
         default: 1
     },
     status: {
-       type: String,
-       default: "Hello there, i'm using AoChat app!" 
-    }
+        type: String,
+        default: "Hello there, i'm using AoChat app!" 
+    },
+    contactId: {
+        type: String,
+    },
+    online: {
+        type: Boolean,
+        default: false
+    },
+
 });
 
-let user = mongoose.model("user", userSchema);
+userSchema.pre('save', function(next) {
+    this.contactId = this.userId;
+    next();
+});
 
-export default user
+let User = mongoose.model("user", userSchema);
+
+export default User

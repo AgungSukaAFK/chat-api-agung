@@ -8,6 +8,7 @@ import session from "express-session";
 import mongodb from "./database/mongodb.js";
 import cors from "cors"
 import MongoDBStore from "connect-mongodb-session";
+import adminRouter from "./router/admin-router.js";
 
 let mongoDBStoreSession = MongoDBStore(session);
 
@@ -97,6 +98,22 @@ const userr = (req, res, next) => {
 }
 
 app.use("/chat", userr, (chatRouter));
+
+app.use("/admin", (req, res, next) => {
+    if(req.session.user){
+        if(req.session.user.userId == "admin"){
+            next();
+        } else {
+            res.status(404).json({
+                message: "Lol, nope"
+            })
+        }
+    } else {
+        res.status(404).json({
+            message: "Lol, nope"
+        })
+    }
+},(adminRouter))
 
 app.get("/", (req, res) => {
     res.json({

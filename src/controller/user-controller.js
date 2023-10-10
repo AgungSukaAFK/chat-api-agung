@@ -1,11 +1,12 @@
-import user from "../model/user-model.js"
+import User from "../model/user-model.js"
+import Contact from "../model/contact-model.js"
 
 // Mendapatkan data user
 const getUser = async (req, res) => {
     let userId = req.params.id
     let userFound = false
     let userAccount;
-    await user.findOne({userId})
+    await User.findOne({userId})
     .then((result) => {
         if(result){
             userFound = true;
@@ -38,7 +39,7 @@ const getUser = async (req, res) => {
 const loginUser = (req, res) => {
     let {userId, password} = req.body; //
     if(userId && password){
-        user
+        User
         .findOne({userId})
         .then((result) => {
             if(result){
@@ -99,15 +100,20 @@ const createUser = async (req, res, next) => {
             message: "Req body required, format read the api spec"
         })
     } else {
-        let newUser = new user({
+        let newUser = new User({
             userId,
             username,
             password
         });
-        
+
+        let newContact = new Contact({
+            contactId: userId,
+            groupIds: ["global", "indonesia"],
+            userIds: []
+        })
         let sudah_ada = true
 
-        await user.findOne({userId}).then((userfound) => {
+        await User.findOne({userId}).then((userfound) => {
             if(userfound){
                 sudah_ada = true
             } else {
@@ -122,6 +128,8 @@ const createUser = async (req, res, next) => {
                 })
             } else if(!sudah_ada){
                 await newUser.save();
+                await newContact.save();
+
                 res.json({
                     message: "User created"
                 })
