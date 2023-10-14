@@ -122,7 +122,7 @@ const chatListener = async (req, res) => {
                     {chatAddress: chatAddress},
                     {$push: {chats: newChat}}
                 )
-                chat.find({chatAddress}).then((result) => {
+                await chat.find({chatAddress}).then((result) => {
                     res.json({
                         chats: result
                     })
