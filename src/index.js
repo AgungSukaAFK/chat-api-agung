@@ -9,6 +9,8 @@ import mongodb from "./database/mongodb.js";
 import cors from "cors"
 import MongoDBStore from "connect-mongodb-session";
 import adminRouter from "./router/admin-router.js";
+import contactRouter from "./router/contact-router.js";
+import groupRouter from "./router/group-router.js";
 
 let mongoDBStoreSession = MongoDBStore(session);
 
@@ -23,10 +25,12 @@ store.on('error', function(error) {
 
 const app = express();
 
+// Nyalain server
 app.listen(4000, () => {
     console.log(`Service listening on PORT 4000 ...`)
 })
 
+// Setting cors
 app.use(cors({
     origin: "https://localhost:5173",
     credentials: true,
@@ -48,6 +52,7 @@ app.use(express.urlencoded({
 
 app.set("trust proxy", 1)
 
+// Setting cookie
 app.use(session({
     name: "ao-chat",
     secret: "secret",
@@ -56,50 +61,24 @@ app.use(session({
     resave: false,
     cookie: {
         secure: 'auto',
-        maxAge: 1000 * 60 * 10,
+        maxAge: 1000 * 60 * 60, // 1000ms * 60 * 60 =  1 jam
         sameSite: "none"
     }
 }))
 
-
-
-app.use("/user", (userRouter));
-
-app.use("/dashboard", (dashboardRouter));
-
-app.get("/login", (req, res) => {
-    let from = req.query.from;
-    let message;
-    if(from == "chat"){
-        message = "Silahkan login dulu untuk masuk ke halaman chat"
-    } else if(from == "dashboard"){
-        message = "Silahkan login dulu untuk mengakses dashboard"
-    } else {
-        message = "Welcome to login"
-    }
-    res.json({
-        message
-    })
-})
-
-
-const userr = (req, res, next) => {
+// BAGIAN MIDDLEWARE KHUSUS
+const loginValidation = (req, res, next) => {
     if(req.session.user){
         console.log(`Dari middleware: ${req.session}`)
         next()
     } else {
-        // res.redirect("/login")
-        // console.log("Sesi chat: " + req.session);
         res.json({
-            session: req.session,
-            message: "fail"
+            message: "No login detected"
         })
     }
 }
 
-app.use("/chat", userr, (chatRouter));
-
-app.use("/admin", (req, res, next) => {
+const adminValidation = (req, res, next) => {
     if(req.session.user){
         if(req.session.user.userId == "admin"){
             next();
@@ -113,14 +92,33 @@ app.use("/admin", (req, res, next) => {
             message: "Lol, nope"
         })
     }
-},(adminRouter))
+}
 
+// BAGIAN MIDDLEWARE ROUTING API
+app.use("/user", (userRouter));
+
+app.use("/dashboard", (dashboardRouter));
+
+app.use("/chat", loginValidation, (chatRouter));
+
+app.use("/admin", adminValidation,(adminRouter));
+
+app.use("/contact", loginValidation, (contactRouter));
+
+app.use("/group", loginValidation, (groupRouter));
+
+// kontak sudah: bisa tambah kontak, gabisa nambah diri sendiri, gabisa nambah kontak yang udah ada, next mungkin delete contact?
+// NEXT: urusin bikin private group buat conversation 2 user alias chatan normal.
+
+// Home route
 app.get("/", (req, res) => {
     res.json({
-        message: "Api working"
+        message: "ACHATT API V2",
+        api_status: "ALL GOOD :)"
     })
 })
 
+// Ngambil semua route selain diatas
 app.use("/*", (req, res, next) => {
     res.status(404)
     .json({

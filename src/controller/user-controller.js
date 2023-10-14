@@ -141,15 +141,42 @@ const createUser = async (req, res, next) => {
             
         }
     }
-    
+}
 
+const getContact = async (req, res) => {
+    if(req.session.user){
+        let contactId = req.session.user.contactId
+        try {
+            await Contact.findOne({contactId}).then((contactFound) => {
+                if(contactFound){
+                    res.json({
+                        message: "Contact found",
+                        contact: contactFound
+                    })
+                } else {
+                    res.json({
+                        message: `Contact with ID "${contactId} is not found :/"`
+                    })
+                }
+            })
+        } catch (error) {
+            res.json({
+                error: error,
+                message: error.message
+            })
+        }
 
-
+    } else {
+        res.json({
+            message: "Login dulu"
+        })
+    }
 }
 
 export default {
     getUser,
     createUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    getContact
 }

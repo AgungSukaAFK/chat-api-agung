@@ -6,7 +6,9 @@ const getDashboard = (req, res) => {
             user: req.session.user
         })
     } else {
-        res.redirect("/login?from=dashboard")
+        res.json({
+            message: "Harus login terlebih dahulu"
+        })
     }
 }
 

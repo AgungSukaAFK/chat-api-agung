@@ -9,10 +9,11 @@ userRouter.post("/logout", userController.logoutUser);
 
 userRouter.post("/create", userController.createUser);
 
-userRouter.get("/:id", userController.getUser);
+userRouter.get("/contact", userController.getContact);
 
+userRouter.get("/:id", userController.getUser); // router ini harus ada di atas yang paling bawah
 
-
+// Router paling bawah
 userRouter.use("/", (req, res) => {
     res.json({
         message: "No controller found for this route"
