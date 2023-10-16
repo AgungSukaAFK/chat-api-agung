@@ -1,4 +1,5 @@
 import Group from "../model/group-model.js";
+import chat from "../model/chats-model.js";
 
 const createGroup = async (req, res) => {
     if(req.body.groupConfig){
@@ -24,7 +25,12 @@ const createGroup = async (req, res) => {
                 message: `Group dengan name: "${groupName}" sudah ada`
             })
         } else {
-            group.save()
+            let newChat = new chat({
+                chatAddress: groupName,
+                chat: []
+            })
+            newChat.save();
+            group.save();
             res.json({
                 message: "Group created succesfully"
             })
