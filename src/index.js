@@ -113,7 +113,8 @@ app.use("/group", loginValidation, (groupRouter));
 // Home route
 app.get("/", (req, res) => {
     res.json({
-        message: "ACHATT API V2",
+        message: "ACHATT API",
+        patch: "2.1",
         api_status: "ALL GOOD :)"
     })
 })

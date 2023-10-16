@@ -152,6 +152,7 @@ Berikut daftar service yang disediakan:
         ]
     }
     ```
+
 2. POST - Mengirim chat  
     >Route: /  
 
@@ -191,6 +192,85 @@ Berikut daftar service yang disediakan:
     }
     ```
 
+### Route: api/group
+1. GET - Mendapatkan informasi semua conversation yang dimiliki contact user  
+    >Route: /conversation  
+
+    Req body: none  
+    Res example  
+    ```json
+    {
+	"result": [
+            {
+                "_id": "652baba9be6ae0b1d0cd8154",
+                "groupName": "agung & agung2",
+                "kind": "conversation",
+                "chatAddress": "agung & agung2",
+                "userIds": [
+                    "agung",
+                    "agung2"
+                ],
+                "__v": 0
+            }
+        ]
+    }
+    ```
+
+2. GET - Mendapatkan informasi semua group public yang tersedia  
+    >Route: /public  
+
+    Req body: none  
+    Res example  
+    ```json
+    {
+        "result": [
+            {
+                "userIds": [],
+                "_id": "652663c8e3f4419aeeabc746",
+                "groupName": "global",
+                "kind": "public",
+                "chatAddress": "global",
+                "__v": 0
+            },
+        ]
+    }
+    ```
+
+3. POST - Membuat conversation baru  
+    >Route: /conversation  
+
+    Req body: 
+    ```json
+    {
+        "groupConfig": {
+            "kind": "conversation",
+            "userIds": ["agung2", "agung"]
+        }
+    }
+    ```  
+    Res example  
+    ```json
+    {
+	    "message": "Private conversation: \"agung2 & agung\" sudah ada"
+    }
+    ```
+
+### Route: api/contact
+1. POST - Menambah userIds di contact  
+    >Route: /  
+
+    Req body:  
+    ```json
+    {
+	    "targetId": "admin"
+    }
+    ```
+    Res example  
+    ```json
+    {
+	    "message": "admin Sudah terdaftar di kontak."
+    }
+    ```
 
 
 ## Database Docs
