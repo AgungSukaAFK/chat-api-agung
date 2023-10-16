@@ -2,7 +2,8 @@ import Contact from "../model/contact-model.js";
 import User from "../model/user-model.js";
 
 const addContact = async (req, res) => {
-    let {contactId, targetId} = req.body;
+    let {targetId} = req.body;
+    let contactId = req.session.user.userId
 
     if(contactId && targetId){
 
@@ -13,30 +14,27 @@ const addContact = async (req, res) => {
             return
         }
 
-        await Contact.findOne({contactId})
+        await Contact.findOne({contactId}) // Nyari kontak
         .then(async (contactFound) => {
-            if(contactFound){
-                res.json({
-                    message: `${targetId} Sudah terdaftar di kontak.`
-                })
+            if(contactFound){ // Kalau ada id Agung, maka harusnya cek apakah userId nya sudah ada
+                let userIds = contactFound.userIds;
+                if(userIds.includes(targetId)){
+                    res.json({
+                        message: `${targetId} Sudah terdaftar di kontak.`
+                    })
+                } else {
+                    await Contact.updateOne(
+                        {contactId},
+                        {$push: {userIds: targetId}}
+                    )
+                    res.json({
+                        message: `${targetId} Berhasil ditambahkan ke kontak.`
+                    })
+                }
             } else {
-                await User.findOne({userId: targetId})
-                .then( async (userFound) =>{
-                    if(userFound){
-                        await Contact.updateOne(
-                            {contactId},
-                            {$push: {userIds: targetId}}
-                        )
-                        res.json({
-                            message: "Contact added"
-                        })
-                    } else {
-                        res.json({
-                            message: "Target userID tidak ditemukan"
-                        })
-                    }
+                res.json({
+                    message: "error: 2, Hubungi admin untuk proses lebih lanjut"
                 })
-                .catch(err => res.json({err}));
             }
         }).catch(err => res.json({err}));
 

@@ -4,6 +4,10 @@ import groupController from "../controller/group-controller.js";
 const groupRouter = Router();
 
 // Membuat private group (conversation)
-groupRouter.post("/", groupController.createPrivateGroup)
+groupRouter.post("/conversation", groupController.createPrivateGroup);
+
+groupRouter.get("/public", groupController.getPublicGroups);
+
+groupRouter.get("/conversation", groupController.getConversations);
 
 export default groupRouter

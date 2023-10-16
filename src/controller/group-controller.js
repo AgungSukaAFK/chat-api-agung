@@ -14,7 +14,8 @@ const createPrivateGroup = async (req, res) => {
             userIds
         })
 
-    let sudah_ada;
+    let sudah_ada; // KEtika user nambah kontak lalu "tambah chat", buat privategroupnya lalu otomatis membuat chatAddress chat nya juga, ketika admin bikin grup otomatis membuat chat, ketika 
+    // Ketika user tambah kontak, lalu tambah chat akan membuat coversation baru dan sudah otomatis dengan chatnya. done
 
     await Group.findOne(
         {$or: [
@@ -45,7 +46,7 @@ const createPrivateGroup = async (req, res) => {
                 await newChat.save()
                 await group.save()
                 res.json({
-                    message: "Private Group created succesfully"
+                    message: "Conversation telah dibuat."
                 })
             } catch (error) {
                 res.json({
@@ -69,6 +70,42 @@ const createPrivateGroup = async (req, res) => {
     }
 }
 
+const getPublicGroups = async (req, res) => {
+    await Group.find({kind: "public"})
+    .then((result) => {
+        if(result){
+            res.json({
+                result
+            })
+        }
+    })
+    .catch(err => {
+        res.json({err})
+    })
+}
+
+const getConversations = async (req, res) => {
+    await Group.find({$and: [
+        {kind: "conversation"},
+        {userIds: {$in: [`${req.session.user.userId}`]}}
+    ]})
+    .then(result => {
+        if(result){
+            if(result.length == 0){
+                res.json({
+                    message: "belum ada conversation."
+                })
+            } else {
+                res.json({
+                    result
+                })
+            }
+        }
+    })
+}
+
 export default {
-    createPrivateGroup
+    createPrivateGroup,
+    getPublicGroups,
+    getConversations,
 }
