@@ -1,17 +1,23 @@
-const getDashboard = (req, res) => {
-    if(req.session.user){
-        delete req.session.user.password
-        res.json({
-            message: `Telah login`,
-            user: req.session.user
-        })
+import dbPool from "../database/mysql-config.js";
+const pool = dbPool.promise();
+
+const getDashboardData = async (req, res, next) => {
+  let { userId } = req.session;
+  // Get all fields
+  pool.query(`SELECT * FROM user WHERE userId = "${userId}"`).then(([rows]) => {
+    if (rows.length) {
+      res.json({
+        message: "ooyay",
+        rows,
+      });
     } else {
-        res.json({
-            message: "Harus login terlebih dahulu"
-        })
+      res.json({
+        message: "Monster on the loose",
+      });
     }
-}
+  });
+};
 
 export default {
-    getDashboard
-}
+  getDashboardData,
+};

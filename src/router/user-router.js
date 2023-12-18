@@ -5,7 +5,7 @@ const userRouter = Router();
 
 userRouter.post("/login", userController.loginUser);
 
-userRouter.post("/logout", userController.logoutUser);
+userRouter.get("/logout", userController.logoutUser);
 
 userRouter.post("/create", userController.createUser);
 
@@ -15,9 +15,9 @@ userRouter.get("/:id", userController.getUser); // router ini harus ada di atas 
 
 // Router paling bawah
 userRouter.use("/", (req, res) => {
-    res.json({
-        message: "No controller found for this route"
-    })
-})
+  res.json({
+    message: "No controller found for this route",
+  });
+});
 
-export default userRouter
+export default userRouter;
