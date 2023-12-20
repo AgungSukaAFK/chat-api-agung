@@ -9,7 +9,9 @@ userRouter.get("/logout", userController.logoutUser);
 
 userRouter.post("/create", userController.createUser);
 
-userRouter.get("/contact", userController.getContact);
+userRouter.post("/update", userController.updateUser);
+
+// userRouter.get("/contact", userController.getContact);
 
 userRouter.get("/:id", userController.getUser); // router ini harus ada di atas yang paling bawah
 

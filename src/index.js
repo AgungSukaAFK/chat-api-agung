@@ -4,6 +4,7 @@ import session from "express-session";
 import dbPool from "./database/mysql-config.js";
 import cors from "cors";
 import MongoDBStore from "connect-mongodb-session";
+import terminalLink from "terminal-link";
 
 // Config imports
 import ansiColor from "./config/ansiColor.js";
@@ -20,6 +21,9 @@ import groupRouter from "./router/group-router.js";
 // Middleware imports
 import loginValidation from "./middleware/loginValidation.js";
 import adminValidation from "./middleware/adminValidation.js";
+import terminalLogs from "./middleware/logs.js";
+import notFound from "./middleware/notFound-middleware.js";
+import errorHandler from "./middleware/error-middleware.js";
 
 // session store config
 let mongoDBStoreSession = MongoDBStore(session);
@@ -35,8 +39,9 @@ store.on("error", function (error) {
 
 // Starting server
 const app = express();
+const PORT = 4000;
 
-app.listen(4000, () => {
+app.listen(PORT, () => {
   console.clear();
   console.log(
     `${ANSICOLOR.yellow}Halo, selamat datang di ${ANSICOLOR.blue}AchPI${
@@ -94,6 +99,9 @@ app.use(
   })
 );
 
+// Loggin middleware
+app.use("/", terminalLogs);
+
 // BAGIAN MIDDLEWARE ROUTING API
 app.use("/user", userRouter);
 
@@ -119,11 +127,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// Ngambil semua route selain diatas
-app.use("/*", (req, res, next) => {
-  res.status(404).json({
-    data: {
-      message: "Page not found",
-    },
-  });
-});
+app.use(notFound);
+
+app.use(errorHandler);

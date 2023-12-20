@@ -1,50 +1,110 @@
-import Contact from "../model/contact-model.js";
-import User from "../model/user-model.js";
+import dbPool from "../database/mysql-config.js";
+const pool = dbPool.promise();
 
-const addContact = async (req, res) => {
-    let {targetId} = req.body;
-    let contactId = req.session.user.userId
+// GET Contact groupIds
+// req: userId
 
-    if(contactId && targetId){
-
-        if(contactId == targetId){
-            res.json({
-                message: "Gak bisa nambahin diri sendiri"
-            });
-            return
-        }
-
-        await Contact.findOne({contactId}) // Nyari kontak
-        .then(async (contactFound) => {
-            if(contactFound){ // Kalau ada id Agung, maka harusnya cek apakah userId nya sudah ada
-                let userIds = contactFound.userIds;
-                if(userIds.includes(targetId)){
-                    res.json({
-                        message: `${targetId} Sudah terdaftar di kontak.`
-                    })
-                } else {
-                    await Contact.updateOne(
-                        {contactId},
-                        {$push: {userIds: targetId}}
-                    )
-                    res.json({
-                        message: `${targetId} Berhasil ditambahkan ke kontak.`
-                    })
-                }
-            } else {
-                res.json({
-                    message: "error: 2, Hubungi admin untuk proses lebih lanjut"
-                })
-            }
-        }).catch(err => res.json({err}));
-
-    } else {
+const getGroupIds = async (req, res, next) => {
+  let { userId } = req.session;
+  await pool
+    .query(`SELECT * FROM contacts WHERE userId = "${userId}"`)
+    .then(([rows]) => {
+      if (rows.length) {
+        let data = rows[0];
         res.json({
-            message: "Request body tidak valid"
-        })
-    }
+          groupids: data.groupids,
+        });
+      } else {
+        res.json({
+          message: "No userId found",
+        });
+      }
+    })
+    .catch((err) => next(err));
+};
+
+const getUserIds = async (req, res, next) => {
+  let { userId } = req.session;
+  await pool
+    .query(`SELECT * FROM contacts WHERE userId = "${userId}"`)
+    .then(([rows]) => {
+      if (rows.length) {
+        let data = rows[0];
+        res.json({
+          userids: data.userIds,
+        });
+      } else {
+        res.json({
+          message: "No userId found",
+        });
+      }
+    })
+    .catch((err) => next(err));
+};
+
+const addGroupid = async (req, res, next) => {
+  let { groupId } = req.body;
+  let { userId } = req.session;
+
+  await pool
+    .query(`SELECT * FROM contacts WHERE userId = "${userId}"`)
+    .then(async ([rows]) => {
+      if (rows.length) {
+        let { groupIds } = rows[0];
+        let arr = Object.values(groupIds);
+        arr.push(groupId);
+        console.log(typeof arr);
+        console.log(arr);
+        await pool
+          .query(
+            `UPDATE contacts SET groupIds = '${JSON.stringify(
+              arr
+            )}' WHERE userId = "${userId}"`
+          )
+          .then(([rows]) => {
+            res.json({
+              message: "Update contact berhasil",
+            });
+          });
+      } else {
+        res.json({
+          message: "No contact found",
+        });
+      }
+    })
+    .catch((err) => next(err));
+};
+
+async function getuis(userId, next) {
+  await pool
+    .query(`SELECT * FROM contacts WHERE userId = "${userId}"`)
+    .then(([rows]) => {
+      if (rows.length) {
+        let data = rows[0];
+        return data.userids;
+      } else {
+        return "No contact found";
+      }
+    })
+    .catch((err) => next(err));
+}
+
+async function getgis(userId, next) {
+  await pool
+    .query(`SELECT * FROM contacts WHERE userId = "${userId}"`)
+    .then(([rows]) => {
+      if (rows.length) {
+        let data = rows[0];
+        return data.groupIds;
+      } else {
+        return "No contact found";
+      }
+    })
+    .catch((err) => next(err));
 }
 
 export default {
-    addContact
-}
+  addGroupid,
+  getGroupIds,
+  getUserIds,
+};

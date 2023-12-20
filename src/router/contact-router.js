@@ -2,6 +2,15 @@ import { Router } from "express";
 import contactController from "../controller/contact-controller.js";
 const contactRouter = Router();
 
-contactRouter.post("/", contactController.addContact)
+// GET user contacts groupIds
+contactRouter.get("/ggis", contactController.getGroupIds);
 
-export default contactRouter
+// GET user contacts userIds
+contactRouter.get("/guis", contactController.getUserIds);
+
+// POST add groupId
+contactRouter.post("/addgis", contactController.addGroupid);
+
+// GET
+
+export default contactRouter;
