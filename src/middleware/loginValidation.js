@@ -1,7 +1,8 @@
 // BAGIAN MIDDLEWARE KHUSUS
 const loginValidation = (req, res, next) => {
-  if (req.session.userId) {
-    console.log(`Dari middleware: userId = ${req.session.userId}`);
+  console.log(req.headers.cookie);
+  if (req.headers.cookie) {
+    console.log(`"Login berhasil"`);
     next();
   } else {
     res.json({

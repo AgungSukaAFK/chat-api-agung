@@ -1,61 +1,31 @@
-import Group from "../model/group-model.js";
-import chat from "../model/chats-model.js";
+import dbPool from "../database/mysql-config.js";
+const pool = dbPool.promise();
 
-const createGroup = async (req, res) => {
-    if(req.body.groupConfig){
-        let {groupName, kind,chatAddress} = req.body.groupConfig;
-        let group = new Group({
-            groupName,
-            kind,
-            chatAddress
-        })
-    
-    let sudah_ada;
-    await Group.findOne({groupName}).then((groupfound) => {
-        if(groupfound){
-            sudah_ada = true
-        } else {
-            sudah_ada = false
-        }
-    })
+const createGroup = async (req, res, next) => {
+  let { groupName, kind } = req.body;
+  // INSERT INTO group_chat (groupName, kind) VALUES ("global", "public");
+  let [row1] = await pool
+    .query(
+      `INSERT INTO group_chat (groupName, kind) VALUES ('${groupName}', '${kind}')`
+    )
+    .catch((err) => next(err));
 
-    try {
-        if(sudah_ada){
-            res.json({
-                message: `Group dengan name: "${groupName}" sudah ada`
-            })
-        } else {
-            let newChat = new chat({
-                chatAddress: groupName,
-                chat: []
-            })
-            newChat.save();
-            group.save();
-            res.json({
-                message: "Group created succesfully"
-            })
-        }
-    } catch (error) {
-        res.json({
-            error: error,
-            message: error.message
-        })
-    }
+  let [row2] = await pool.query(
+    `INSERT INTO chat_table (chatAddress, chats) VALUES ("${groupName}", "[]")`
+  );
 
-    } else {
-        res.json({
-            message: "groupConfig is not defined correctly"
-        })
-    }
-}
+  res.json({
+    message: "Group chat telah dibuah",
+  });
+};
 
 const getGroups = (req, res) => {
-    res.json({
-        message: "admin approved"
-    })
-}
+  res.json({
+    message: "admin approved",
+  });
+};
 
 export default {
-    createGroup,
-    getGroups
-}
+  createGroup,
+  getGroups,
+};

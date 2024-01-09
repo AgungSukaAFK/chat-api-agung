@@ -1,151 +1,93 @@
-import chat from "../model/chats-model.js";
-
-// const getChat =  async (req, res)=> {
-//     let objChats = await chat.find({chatAddress: "global"});
-//     let chatsFound;
-//     objChats.forEach((item) => {
-//         if(item.chatAddress == "global"){ // ubah ini jadi globalnya dimbil dari tab chat yang sedang aktif
-//             chatsFound = item.chats;
-//         }
-//     })
-
-//     if(chatsFound){
-//         res.json({
-//             chats: chatsFound
-//         })
-//     } else {
-//         res.status(500).json({
-//             message: "Database error cant find chat server"
-//         })
-//     }
-
-// }
-
-// const sendChat = async (req, res)=> {
-//     let reqChat = req.body.chat;
-//     let reqFrom = req.body.from;
-
-//     // Bikin server global
-//     // let newServer = new chat({
-//     //     server: "global",
-//     //     chats: [{}]
-//     // })
-//     // newServer.save();
-//     // res.json({
-//     //     "Message": "yeay"
-//     // })
-
-//     let newChat = {
-//         chat: reqChat,
-//         from: reqFrom
-//     }
-
-//     if(newChat.chat && newChat.from){
-//         try {
-//             await chat.updateOne(
-//                 {chatAddress: "global"},
-//                 {$push: {chats: newChat}}
-//             )
-//             chat.find().then((result) => {
-//                 res.json({
-//                     chats: result
-//                 })
-//             })
-//         } catch (error) {
-//             res.json({
-//                 error
-//             })
-//         }
-//     } else {
-//         res.json({
-//             message: "Chat gagal terkirim, kekurangan atribut"
-//         })
-//     }
-
-// } Alih fungsi #1
+import dbPool from "../database/mysql-config.js";
+const pool = dbPool.promise();
 
 const createChat = async (req, res) => {
-    let newChat = new chat({
-        chatAddress: req.body.chatAddress,
-        chat: []
-    })
+  return;
+};
 
-    try {
-        await newChat.save()
-        res.json({
-            message: "New chat created successfully"
-        })
-    } catch (error) {
-        res.json({
-            error: error,
-            message: error.message
-        })
+const chatListener = async (req, res, next) => {
+  let method = req.body.purpose;
+  if (method == "GET") {
+    let { chatAddress } = req.body;
+    let [row] = await pool
+      .query(
+        `SELECT chats FROM chat_table WHERE chatAddress = "${chatAddress}"`
+      )
+      .catch((err) => next(err));
+    if (!row.length) {
+      res.json({
+        message: "Chat tidak ada",
+        code: 2,
+      });
+      return;
+    }
+    let { chats } = row[0];
+    res.json({
+      chats,
+    });
+  } else if (method == "POST") {
+    let { chatAddress, from, chat } = req.body;
+    // chat = chat.replace(/\n/g, "\\n");
+    // console.log(chat);
+    let [row] = await pool
+      .query(
+        `SELECT chats FROM chat_table WHERE chatAddress = "${chatAddress}"`
+      )
+      .catch((err) => next(err));
+
+    if (!row.length) {
+      res.json({
+        message: "Chat tidak ada",
+      });
+      return;
     }
 
-}
+    let chatsDb = row[0];
+    let chatArr = Object.values(chatsDb.chats);
+    let chatInput = {
+      from,
+      chat,
+    };
+    chatArr.push(chatInput);
 
-const chatListener = async (req, res) => {
-    let {action, chatAddress} = req.body;
+    let stringifiedArr = JSON.stringify(chatArr);
 
-    if(action == "get"){
-        let objChats = await chat.find({chatAddress});
-        let chatsFound;
-        objChats.forEach((item) => {
-            if(item.chatAddress == chatAddress){ 
-                chatsFound = item.chats;
-            }
-        })
-
-        if(chatsFound){
-            res.json({
-                chats: chatsFound
-            })
-        } else {
-            res.status(500).json({
-                message: "Database error cant find chatAddress"
-            })
-        }
-
-    } else if(action == "send"){
-        
-        let reqChat = req.body.chat;
-        let reqFrom = req.body.from;
-
-        let newChat = {
-            chat: reqChat,
-            from: reqFrom
-        }
-
-        if(newChat.chat && newChat.from){
-            try {
-                await chat.updateOne(
-                    {chatAddress: chatAddress},
-                    {$push: {chats: newChat}}
-                )
-                await chat.find({chatAddress}).then((result) => {
-                    res.json({
-                        chats: result
-                    })
-                })
-            } catch (error) {
-                res.json({
-                    error
-                })
-            }
-        } else {
-            res.json({
-                message: "Chat gagal terkirim, kekurangan atribut"
-            })
-        }
-
-    } else {
+    await pool
+      .query(
+        `UPDATE chat_table SET chats = '${stringifiedArr}' WHERE chatAddress = "${chatAddress}"`
+      )
+      .then(() => {
         res.json({
-            message: "Action tidak dikenal"
-        })
+          message: "chat terkirim",
+          code: 1,
+        });
+      })
+      .catch((err) => next(err));
+  } else if (method == "GETLAST") {
+    let { chatAddress } = req.body;
+    let [row] = await pool.query(
+      `SELECT chats FROM chat_table WHERE chatAddress = "${chatAddress}"`
+    );
+    if (!row.length) {
+      res.json({
+        message: "Chat tidak ada",
+      });
+      return;
     }
-}
+    let arr = row[0];
+    let { chats } = arr;
+    const lastChat = chats[chats.length - 1];
+    res.json({
+      lastChat,
+    });
+  } else {
+    res.json({
+      message: "Method tidak diterima",
+    });
+  }
+};
 
 export default {
-    chatListener,
-    createChat
-}
+  chatListener,
+  createChat,
+};

@@ -1,6 +1,7 @@
 const adminValidation = (req, res, next) => {
-  if (req.session.user) {
-    if (req.session.user.userId == "admin") {
+  if (req.session.userId) {
+    if (req.session.userId == "admin") {
+      console.log("Admin approved: ");
       next();
     } else {
       res.status(404).json({

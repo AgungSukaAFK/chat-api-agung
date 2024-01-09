@@ -3,30 +3,29 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 let chatSchema = new Schema({
-    chatAddress: {
+  chatAddress: {
+    type: String,
+    required: true,
+  },
+  chats: [
+    {
+      _id: false,
+      chat: {
         type: String,
-        required: true
+      },
+      from: {
+        type: String,
+      },
+      date: {
+        type: String,
+      },
     },
-    chats: [
-        {
-            _id: false,
-            chat: {
-                type: String
-            },
-            from: {
-                type: String
-            },
-            date: {
-                type: String
-            }
-        }
-    ]
-})
+  ],
+});
 
+let chat = mongoose.model("chat", chatSchema);
 
-let chat = mongoose.model("chat", chatSchema)
-
-export default chat
+export default chat;
 
 // Skema lama sebelum refactor (deprecated)
 // let chatSchema = new Schema({

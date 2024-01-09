@@ -5,7 +5,6 @@ import dbPool from "./database/mysql-config.js";
 import cors from "cors";
 import MongoDBStore from "connect-mongodb-session";
 import terminalLink from "terminal-link";
-
 // Config imports
 import ansiColor from "./config/ansiColor.js";
 const ANSICOLOR = ansiColor;
@@ -39,7 +38,7 @@ store.on("error", function (error) {
 
 // Starting server
 const app = express();
-const PORT = 4000;
+const PORT = 4001;
 
 app.listen(PORT, () => {
   console.clear();
@@ -57,45 +56,31 @@ app.listen(PORT, () => {
   console.log("----------- LOGS ---------");
 });
 
+// app.enable("trust proxy");
+
 // Setting cors
+// app.use(
+//   cors({
+//     origin: "https://1740-114-79-6-41.ngrok-free.app/",
+//     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+//     credentials: true,
+//   })
+// );
+
+const api = "https://3358-182-2-135-113.ngrok-free.app";
 app.use(
   cors({
-    origin: "https://localhost:5173",
-    credentials: true,
+    origin: [api, "http://localhost:5173", "http://localhost:5174"],
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "ngrok-skip-browser-warning"],
   })
 );
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://localhost:5173");
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
 
 app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
-  })
-);
-
-// app.use(cookieParser("secret"))
-
-app.set("trust proxy", 1);
-
-// Setting cookie
-app.use(
-  session({
-    name: "AchPI 2.1",
-    secret: "secret",
-    store: store,
-    saveUninitialized: true,
-    resave: false,
-    cookie: {
-      secure: "auto",
-      maxAge: 1000 * 60 * 60, // 1000ms * 60 * 60 =  1 jam
-      sameSite: "none",
-    },
   })
 );
 
@@ -107,7 +92,8 @@ app.use("/user", userRouter);
 
 app.use("/dashboard", loginValidation, dashboardRouter);
 
-app.use("/chat", loginValidation, chatRouter);
+app.use("/chat", chatRouter);
+// app.use("/chat", loginValidation, chatRouter);
 
 app.use("/admin", adminValidation, adminRouter);
 

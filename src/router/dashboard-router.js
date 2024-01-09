@@ -5,4 +5,6 @@ const dashboardRouter = Router();
 
 dashboardRouter.get("/", dashboardController.getDashboardData);
 
+dashboardRouter.post("/pindex", dashboardController.getPhotoIndex);
+
 export default dashboardRouter;

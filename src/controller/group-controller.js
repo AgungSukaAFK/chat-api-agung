@@ -1,111 +1,74 @@
-import Group from "../model/group-model.js";
-import chat from "../model/chats-model.js";
+import dbPool from "../database/mysql-config.js";
+const pool = dbPool.promise();
 
 // Cek apakah sudah ada > jika belum, buat baru,
-const createPrivateGroup = async (req, res) => {
-    if(req.body.groupConfig){
-        let {kind, userIds} = req.body.groupConfig;
-        let groupName = `${userIds[0]} & ${userIds[1]}`
-        let chatAddress = groupName
-        let group = new Group({
-            groupName,
-            kind,
-            chatAddress,
-            userIds
-        })
+const createConversation = async (req, res, next) => {
+  let { userId, userId2 } = req.body;
 
-    let sudah_ada; // KEtika user nambah kontak lalu "tambah chat", buat privategroupnya lalu otomatis membuat chatAddress chat nya juga, ketika admin bikin grup otomatis membuat chat, ketika 
-    // Ketika user tambah kontak, lalu tambah chat akan membuat coversation baru dan sudah otomatis dengan chatnya. done
+  // validasi request body valid
+  if (!userId || !userId2) {
+    res.json({
+      Message: "User Id kurang",
+    });
+    return;
+  }
 
-    await Group.findOne(
-        {$or: [
-            {groupName: `${userIds[0]} & ${userIds[1]}`},
-            {groupName: `${userIds[1]} & ${userIds[0]}`}
-        ]}
-        ).then((groupfound) => {
-        if(groupfound){
-            sudah_ada = true
-        } else {
-            sudah_ada = false
-        }
-    })
+  // validasi userId valid
+  let [validateRow] = await pool
+    .query(`select * from user where userId = "${userId}"`)
+    .catch((err) => next(err));
+  let [validateRow2] = await pool
+    .query(`select * from user where userId = "${userId2}"`)
+    .catch((err) => next(err));
+  //validasi apakah sudah ada datanya
+  let [validateRow3] = await pool
+    .query(
+      `select * from group_chat where groupName LIKE "%${userId}%" AND groupName LIKE "%${userId2}%"`
+    )
+    .catch((err) => next(err));
 
-    try {
-        if(sudah_ada){
-            res.json({
-                message: `Private conversation: "${groupName}" sudah ada`
-            })
-        } else {
+  if (!validateRow.length || !validateRow2.length) {
+    res.json({
+      message: "userId tidak valid",
+      code: 2,
+    });
+    return;
+  }
+  if (validateRow3.length) {
+    res.json({
+      message: "sudah ada conversation",
+      code: 2,
+    });
+    return;
+  }
 
-            let newChat = new chat({
-                chatAddress: groupName,
-                chat: []
-            })
-        
-            try {
-                await newChat.save()
-                await group.save()
-                res.json({
-                    message: "Conversation telah dibuat."
-                })
-            } catch (error) {
-                res.json({
-                    error: error,
-                    message: error.message
-                })
-            }
+  let arr = [userId, userId2];
+  let stringArr = arr.join("&");
+  let [row] = await pool
+    .query(
+      `INSERT INTO group_chat (groupName, kind) VALUES ("${stringArr}", "private")`
+    )
+    .catch((err) => {
+      next(err);
+      return;
+    });
 
-        }
-    } catch (error) {
-        res.json({
-            error: error,
-            message: error.message
-        })
-    }
+  let [row2] = await pool.query(
+    `INSERT INTO chat_table (chatAddress, chats) VALUES ("${stringArr}", '[]')`
+  );
 
-    } else {
-        res.json({
-            message: "groupConfig is not defined correctly"
-        })
-    }
-}
+  res.json({
+    message: "Chat baru sudah terbuat",
+    code: 1,
+  });
+};
 
-const getPublicGroups = async (req, res) => {
-    await Group.find({kind: "public"})
-    .then((result) => {
-        if(result){
-            res.json({
-                result
-            })
-        }
-    })
-    .catch(err => {
-        res.json({err})
-    })
-}
+const getPublicGroups = async (req, res) => {};
 
-const getConversations = async (req, res) => {
-    await Group.find({$and: [
-        {kind: "conversation"},
-        {userIds: {$in: [`${req.session.user.userId}`]}}
-    ]})
-    .then(result => {
-        if(result){
-            if(result.length == 0){
-                res.json({
-                    message: "belum ada conversation."
-                })
-            } else {
-                res.json({
-                    result
-                })
-            }
-        }
-    })
-}
+const getConversations = async (req, res) => {};
 
 export default {
-    createPrivateGroup,
-    getPublicGroups,
-    getConversations,
-}
+  createConversation,
+  getPublicGroups,
+  getConversations,
+};

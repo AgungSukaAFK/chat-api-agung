@@ -3,6 +3,10 @@ import userController from "../controller/user-controller.js";
 
 const userRouter = Router();
 
+userRouter.get("/myid", userController.getMyId);
+
+userRouter.post("/photo", userController.getPhoto);
+
 userRouter.post("/login", userController.loginUser);
 
 userRouter.get("/logout", userController.logoutUser);
@@ -10,6 +14,8 @@ userRouter.get("/logout", userController.logoutUser);
 userRouter.post("/create", userController.createUser);
 
 userRouter.post("/update", userController.updateUser);
+
+userRouter.get("/allgroups", userController.getAllGroups);
 
 // userRouter.get("/contact", userController.getContact);
 
